@@ -22,22 +22,22 @@ const Row = props => {
       dangerouslySetInnerHTML={{ __html: shapeLibrary(node) }}
     ></svg>
   ))
-  render: {
-    return (
-      <div
-        style={{
-          display: `flex`,
-          alignItems: `center`,
-          maxWidth: `400px`,
-          marginBottom: `1rem`,
-          fontSize: `12px`,
-        }}
-      >
-        <span style={{ width: `80px` }}>{props.title}</span>
-        {symbols}
-      </div>
-    )
-  }
+  // render: {
+  return (
+    <div
+      style={{
+        display: `flex`,
+        alignItems: `center`,
+        maxWidth: `400px`,
+        marginBottom: `1rem`,
+        fontSize: `12px`,
+      }}
+    >
+      <span style={{ width: `80px` }}>{props.title}</span>
+      {symbols}
+    </div>
+  )
+  // }
 }
 
 Row.propTypes = {
