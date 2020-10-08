@@ -1,29 +1,23 @@
 import React, { Component } from "react"
-import { Link } from "gatsby"
-// import Row from "../components/row"
-
-const shapeLibrary = type => {
-  if (type === 1) {
-    return `
-      <line x1="5" y1="5" x2="15" y2="15" stroke="black" strokeWidth="1" />
-      <line x1="5" y1="15" x2="15" y2="5" stroke="black" strokeWidth="1" />
-    `
-  } else if (type === 2) {
-    return `<circle r="7" cx="10" cy="10" fill="white" stroke="black" />`
-  } else if (type === 3) {
-    return `<circle r="5" cx="10" cy="10" fill="black" />`
-  } else return `<circle r="1" cx="10" cy="10" fill="black" />`
-}
+// import { Link } from "gatsby"
+import shapeLibrary from "../shapeLibrary"
+import Layout from "../components/layout"
+import Display from "../components/display"
 
 class NameForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      title: "Sangban",
-      nodes: [3, 1, 0, 1, 0, 1, 1, 0, 1, 0, 2, 0],
+      title: "Title",
+      steps: 12,
+      name: "Instrument",
+      nodes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      rows: [],
     }
 
     this.handleTitleChange = this.handleTitleChange.bind(this)
+    this.handleStepsChange = this.handleStepsChange.bind(this)
+    this.handleNameChange = this.handleNameChange.bind(this)
     this.handleNodeChange = this.handleNodeChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.makeNode = this.makeNode.bind(this)
@@ -33,8 +27,24 @@ class NameForm extends Component {
     this.setState({ title: event.target.value })
   }
 
+  handleStepsChange(event) {
+    const newSteps = parseInt(event.target.value)
+    const emptyNodes = Array(newSteps).fill(0)
+    this.setState({ steps: newSteps, nodes: emptyNodes })
+    console.log(newSteps, emptyNodes)
+  }
+
+  handleNameChange(event) {
+    this.setState({ name: event.target.value })
+    event.preventDefault()
+  }
+
   handleSubmit(event) {
-    alert(`Updated: ${this.state.title} ${this.state.nodes}`)
+    let newRows = this.state.rows
+    newRows.push({ name: this.state.name, nodes: this.state.nodes })
+    const emptyNodes = Array(this.state.steps).fill(0)
+    this.setState({ rows: newRows, name: "Instrument", nodes: emptyNodes })
+    // alert(`Updated: ${this.state.name} ${this.state.nodes}`)
     event.preventDefault()
   }
 
@@ -42,8 +52,14 @@ class NameForm extends Component {
     return (
       <span
         onClick={() => this.handleNodeChange(data, index)}
-        onKeyUp={() => this.handleNodeChange(data, index)}
+        onKeyPress={e => {
+          console.log(e.key)
+          if (e.key === " ") {
+            this.handleNodeChange(data, index)
+          }
+        }}
         role="button"
+        tabIndex="0"
         key={index}
       >
         <svg
@@ -57,7 +73,6 @@ class NameForm extends Component {
   }
 
   handleNodeChange(data, index) {
-    // alert(`A node was clicked: ${data} ${index} ${this.state.nodes[index]}`)
     let newNodes = this.state.nodes
     newNodes[index] = (newNodes[index] + 1) % 4
     this.setState({ nodes: newNodes })
@@ -65,25 +80,45 @@ class NameForm extends Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={this.state.title}
-            onChange={this.handleTitleChange}
-          />
-          {this.state.nodes.map(
-            (value, index) => this.makeNode(value, index),
-            this
-          )}
-          {/* <Row title={this.state.title} nodes={this.state.nodes} /> */}
-        </label>
-        <div>
-          <input type="submit" value="Submit" />
-          <Link to="/">Return to Home</Link>
-        </div>
-      </form>
+      <Layout>
+        <form onSubmit={this.handleTitleSubmit}>
+          <div>
+            <input
+              type="text"
+              value={this.state.title}
+              onChange={this.handleTitleChange}
+            />
+            <input
+              type="number"
+              value={this.state.steps}
+              onChange={this.handleStepsChange}
+            />
+          </div>
+        </form>
+        <form onSubmit={this.handleSubmit}>
+          <div className="row">
+            <label className="input-label">
+              Name:
+              <input
+                type="text"
+                value={this.state.name}
+                onChange={this.handleNameChange}
+              />
+            </label>
+            <div className="nodes">
+              {this.state.nodes.map(
+                (value, index) => this.makeNode(value, index),
+                this
+              )}
+            </div>
+          </div>
+          <div>
+            <input type="submit" value="Add Row" />
+          </div>
+        </form>
+        <hr />
+        <Display data={this.state} />
+      </Layout>
     )
   }
 }
